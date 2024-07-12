@@ -23,6 +23,25 @@
 
 	let selectedCell = { row: -1, col: -1 };
 
+	// 计时器
+	let interval: string | number | NodeJS.Timeout | undefined;
+	let time = 0;
+	function startTimer() {
+		interval = setInterval(() => {
+			time++;
+		}, 1000);
+	}
+
+	function stopTimer() {
+		clearInterval(interval);
+		interval = undefined;
+	}
+
+	function resetTimer() {
+		stopTimer();
+		time = 0;
+	}
+
 	function selectCell(row: number, col: number) {
 		selectedCell = { row, col };
 	}
@@ -35,6 +54,8 @@
 		win = false;
 		// heihei把solve_board发到f12,开个小后门
 		console.log(solvedBoard);
+		resetTimer();
+		startTimer();
 	}
 	function ReSeed() {
 		board = base64_seed_to_board(seed);
@@ -75,6 +96,7 @@
 
 		console.log('Congratulations! You have solved the puzzle.');
 
+		stopTimer();
 		return true; // 如果所有值都匹配，设置 win 为 true
 	}
 
@@ -118,6 +140,7 @@
 
 	function tobegin() {
 		begin = false;
+		seed = '';
 	}
 
 	function getSeed() {
@@ -137,6 +160,9 @@
 {/if}
 
 {#if begin}
+	<div class="timer">
+		{time} 秒
+	</div>
 	<table>
 		{#each userBoard as row, rowIndex}
 			<tr>
@@ -165,23 +191,27 @@
 	</table>
 {/if}
 {#if begin === false}
-	<button class="btn variant-filled-surface btn_sudo" on:click={Regenrate}>开始</button>
+	<button class="btn variant-glass-primary btn_sudo" on:click={Regenrate}>开始</button>
 	<select class="select sel_sudo" bind:value={difficulty}>
 		<option value="0">简单</option>
 		<option value="1">中等</option>
 		<option value="2">困难</option>
 		<option value="3">进阶</option>
 	</select>
-	<div>
-		<p>从种子生成数独</p>
-		<input type="text" class="variant-glass-primary" bind:value={seed} />
-		<button class="btn" on:click={ReSeed}>生成</button>
+	<div class="seed_div">
+		<input
+			type="text"
+			class="variant-glass-primary seed_input"
+			bind:value={seed}
+			placeholder="看看你的种子"
+		/>
+		<button class="btn variant-glass-primary" on:click={ReSeed}>生成</button>
 	</div>
 {:else}
-	<button class="btn" on:click={Regenrate}>新开始</button>
-	<button class="btn" on:click={getSeed}>获取种子</button>
-	<button class="btn" on:click={tobegin}>返回</button>
-	<CodeBlock language="txt" code={seed} />
+	<button class="btn variant-glass-primary ma_btn" on:click={Regenrate}>新开始</button>
+	<button class="btn variant-glass-primary ma_btn" on:click={getSeed}>获取种子</button>
+	<button class="btn variant-glass-primary ma_btn" on:click={tobegin}>返回</button>
+	<CodeBlock language="txt" code={seed} buttonCopied="复制好了,快去试试分享吧" />
 {/if}
 
 <style>
@@ -207,6 +237,8 @@
 	}
 	table {
 		border-collapse: collapse; /* 去除表格边框间的间隙 */
+		/* 暖色阴影 */
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 	}
 	td {
 		width: 40px; /* 宽度 */
@@ -265,5 +297,27 @@
 
 	.sel_sudo {
 		width: 100px;
+	}
+	/* 圆角,placehoder的颜色为灰色 */
+	.seed_input {
+		width: 200px;
+		border-radius: 10px;
+		margin: 5px;
+		padding: 5px;
+	}
+	/* 选中后颜色和阴影,暖色 */
+	.seed_input:focus {
+		outline: none;
+		box-shadow: 0 0 10px #a47000;
+		border: 1px solid #a06e00;
+	}
+	.seed_div {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 10px;
+	}
+	.ma_btn {
+		margin: 5px;
 	}
 </style>
