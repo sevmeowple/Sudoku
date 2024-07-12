@@ -63,6 +63,8 @@
 		userBoard = board.map((row) => row.slice());
 		begin = true;
 		win = false;
+		resetTimer();
+		startTimer();
 		console.log(solvedBoard);
 	}
 
