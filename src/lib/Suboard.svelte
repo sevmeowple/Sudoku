@@ -9,8 +9,15 @@
 	import { onMount } from 'svelte';
 	import { CodeBlock } from '@skeletonlabs/skeleton';
 	// export let board: number[][];
-	let bye = ['小试牛刀,轻松拿下', '初窥门径,游刃有余', '驾轻就熟,炉火纯青', '大师!'];
+	let bye = [
+		'小试牛刀,轻松拿下',
+		'初窥门径,游刃有余',
+		'驾轻就熟,炉火纯青',
+		'大师!',
+		'即使投降也很棒了'
+	];
 	let win = false;
+	let giveUp = false;
 	let byenum = 0;
 	let seed = '';
 	const BASE64: string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-';
@@ -23,6 +30,7 @@
 
 	let selectedCell = { row: -1, col: -1 };
 
+	let falseNum = 0;
 	// 计时器
 	let interval: string | number | NodeJS.Timeout | undefined;
 	let time = 0;
@@ -52,10 +60,13 @@
 		userBoard = board.map((row) => row.slice());
 		begin = true;
 		win = false;
+		giveUp = false;
+		falseNum = 0;
 		// heihei把solve_board发到f12,开个小后门
 		console.log(solvedBoard);
 		resetTimer();
 		startTimer();
+		falseNum = 0;
 	}
 	function ReSeed() {
 		board = base64_seed_to_board(seed);
@@ -71,6 +82,7 @@
 	// 定义一个获取单元格的类名的方法
 	function getCellClass(row: number, col: number): string {
 		const cellEl = document.querySelector(`#cell-${row}-${col}`);
+		console.log('custonm');
 		if (cellEl) {
 			cellEl.classList.remove('correct');
 			cellEl.classList.remove('incorrect');
@@ -79,6 +91,8 @@
 			if (userBoard[row][col] === solvedBoard[row][col]) {
 				return 'correct';
 			} else if (userBoard[row][col] !== 0) {
+				falseNum = falseNum + 1;
+				console.log(falseNum);
 				return 'incorrect';
 			}
 			return 'empty';
@@ -94,7 +108,9 @@
 				}
 			}
 		}
-		byenum = parseInt(difficulty);
+		if (giveUp) {
+			byenum = 4;
+		} else byenum = parseInt(difficulty);
 
 		console.log('Congratulations! You have solved the puzzle.');
 
@@ -118,6 +134,7 @@
 				if (cellElement) {
 					cellElement.classList.remove('correct');
 					cellElement.classList.add('incorrect');
+					falseNum = falseNum + 1;
 				}
 			}
 		}
@@ -142,7 +159,16 @@
 
 	function tobegin() {
 		begin = false;
+		win = false;
+		giveUp = false;
 		seed = '';
+	}
+
+	// 投降函数
+	function giveup() {
+		userBoard = solvedBoard.map((row) => row.slice());
+		giveUp = true;
+		stopTimer();
 	}
 
 	function getSeed() {
@@ -160,10 +186,16 @@
 {#if win}
 	<h1>{bye[byenum]}</h1>
 {/if}
+{#if giveUp}
+	<h1>{bye[4]}</h1>
+{/if}
 
 {#if begin}
 	<div class="timer">
 		{time} 秒
+	</div>
+	<div class="falseNum">
+		已有{falseNum} 个错误
 	</div>
 	<table>
 		{#each userBoard as row, rowIndex}
@@ -210,9 +242,12 @@
 		<button class="btn variant-glass-primary" on:click={ReSeed}>生成</button>
 	</div>
 {:else}
-	<button class="btn variant-glass-primary ma_btn" on:click={Regenrate}>新开始</button>
-	<button class="btn variant-glass-primary ma_btn" on:click={getSeed}>获取种子</button>
-	<button class="btn variant-glass-primary ma_btn" on:click={tobegin}>返回</button>
+	<div class="buttons-container">
+		<button class="btn variant-glass-primary ma_btn" on:click={giveup}>投降喵</button>
+		<button class="btn variant-glass-primary ma_btn" on:click={Regenrate}>新开始</button>
+		<button class="btn variant-glass-primary ma_btn" on:click={getSeed}>获取种子</button>
+		<button class="btn variant-glass-primary ma_btn" on:click={tobegin}>返回</button>
+	</div>
 	<CodeBlock language="txt" code={seed} buttonCopied="复制好了,快去试试分享吧" />
 {/if}
 
@@ -321,5 +356,13 @@
 	}
 	.ma_btn {
 		margin: 5px;
+	}
+
+	.buttons-container {
+		display: grid; /* 启用Grid布局 */
+		grid-template-columns: 1fr 1fr; /* 设置两列，每列占用可用空间的一份 */
+		grid-gap: 10px; /* 设置行和列之间的间隔为10px */
+		justify-content: center; /* 在容器内部水平居中对齐网格 */
+		align-items: center; /* 在容器内部垂直居中对齐网格项 */
 	}
 </style>
