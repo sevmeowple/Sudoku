@@ -10,7 +10,7 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "deploy": "bun run build && touch build/.nojekyll && gh-pages -d build "
+    "deploy": "bun run build && touch build/.nojekyll && gh-pages -d build -r https://github.com/sevmeowple/Sudoku.git"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",
