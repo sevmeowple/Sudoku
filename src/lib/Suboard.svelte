@@ -291,12 +291,12 @@
 		cursor: pointer; /* 鼠标指针 */
 	}
 	.number-selector {
-		position: absolute; /* 绝对定位 */
-		top: 50%; /* 单元格中心 */
-		left: 50%; /* 单元格中心 */
+		position: fixed; /* 固定定位 */
+		top: 50%; /* 页面中心 */
+		left: 50%; /* 页面中心 */
 		transform: translate(-50%, -50%); /* 向左上移动 */
-		width: 120px; /* 3 * 40px */
-		height: 120px; /* 3 * 40px */
+		width: 150px; /* 3 * 40px */
+		height: 150px; /* 3 * 40px */
 		background-color: white;
 		border: 1px solid #ccc; /* 淡灰色 */
 		display: grid; /* 使用网格布局 */
